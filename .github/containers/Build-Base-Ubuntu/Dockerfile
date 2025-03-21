@@ -100,7 +100,8 @@ RUN add-apt-repository -y ppa:ubuntugis/ppa && apt-get update && \
     libproj-dev \
     libxml2-dev \
     libjson-c-dev \
-    libgeos++-dev libgeos3.11.1 libgeos-c1v5 libgeos-dev \
+    libgeos-dev \
+    libgeos++-dev \
     && rm -rf /var/lib/apt/lists/*
 COPY scripts/install_setup_postgis.sh /tmp/install_setup/
 RUN [ "bin/bash", "-c", "PGVERSION=$PG_VERSION /tmp/install_setup/install_setup_postgis.sh" ]
