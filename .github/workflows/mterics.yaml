@@ -1,0 +1,17 @@
+name: Monthly DocumentDB Metrics
+
+on:
+  schedule:
+    - cron: '0 0 1 * *'  # Runs on the 1st of every month at midnight UTC
+  workflow_dispatch:      # Allows manual triggering from GitHub UI
+
+jobs:
+  collect_metrics:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run GitHub Issue Metrics
+        uses: github/issue-metrics@v3
+        with:
+          search_query: 'repo:microsoft/documentdb is:issue created:>={{ github.event.inputs.start_date || "2025-04-01" }}'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
