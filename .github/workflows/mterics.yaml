@@ -1,4 +1,4 @@
-name: Monthly DocumentDB Metrics
+name: Monthly DocumentDB Issue Metrics
 
 on:
   schedule:
