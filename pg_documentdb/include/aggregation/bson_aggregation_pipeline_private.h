@@ -19,7 +19,7 @@
 #ifndef BSON_AGGREGATION_PIPELINE_PRIVATE_H
 #define BSON_AGGREGATION_PIPELINE_PRIVATE_H
 
-typedef struct AggregationStageDefinition AggregationStageDefinition;
+struct AggregationStageDefinition;
 
 /*
  * for nested stage, use this to record its parent stage name
@@ -185,7 +185,7 @@ typedef struct
 	bson_value_t stageValue;
 
 	/* Definition of internal handlers */
-	AggregationStageDefinition *stageDefinition;
+	struct AggregationStageDefinition *stageDefinition;
 } AggregationStage;
 
 

@@ -252,7 +252,7 @@ const char *CompatibleChangeStreamPipelineStages[COMPATIBLE_CHANGE_STREAM_STAGES
 	"$unset",
 	"$redact"
 };
-
+#if 0
 static const AggregationStageDefinition LookupUnwindStageDefinition = {
 	.stage = "$lookupUnwind",
 	.mutateFunc = &HandleLookupUnwind,
@@ -268,7 +268,7 @@ static const AggregationStageDefinition LookupUnwindStageDefinition = {
 	.allowBaseShardTablePushdown = false,
 	.stageEnum = Stage_LookupUnwind,
 };
-
+#endif
 /* Stages and their definitions sorted by name.
  * Please keep this list sorted.
  */
@@ -458,6 +458,7 @@ static const AggregationStageDefinition StageDefinitions[] =
 		.allowBaseShardTablePushdown = true,
 		.stageEnum = Stage_GeoNear,
 	},
+#if 0
 	{
 		.stage = "$graphLookup",
 		.mutateFunc = &HandleGraphLookup,
@@ -471,6 +472,7 @@ static const AggregationStageDefinition StageDefinitions[] =
 		.allowBaseShardTablePushdown = false,
 		.stageEnum = Stage_GraphLookup,
 	},
+#endif
 	{
 		.stage = "$group",
 		.mutateFunc = &HandleGroup,
@@ -562,6 +564,7 @@ static const AggregationStageDefinition StageDefinitions[] =
 		.allowBaseShardTablePushdown = false,
 		.stageEnum = Stage_ListSessions,
 	},
+#if 0
 	{
 		.stage = "$lookup",
 		.mutateFunc = &HandleLookup,
@@ -577,6 +580,7 @@ static const AggregationStageDefinition StageDefinitions[] =
 		.allowBaseShardTablePushdown = false,
 		.stageEnum = Stage_Lookup,
 	},
+#endif
 	{
 		.stage = "$match",
 		.mutateFunc = &HandleMatchAggregationStage,
@@ -594,6 +598,7 @@ static const AggregationStageDefinition StageDefinitions[] =
 		.allowBaseShardTablePushdown = true,
 		.stageEnum = Stage_Match,
 	},
+#if 0
 	{
 		.stage = "$merge",
 		.mutateFunc = &HandleMerge,
@@ -607,6 +612,8 @@ static const AggregationStageDefinition StageDefinitions[] =
 		.allowBaseShardTablePushdown = false,
 		.stageEnum = Stage_Merge,
 	},
+#endif
+#if 0
 	{
 		.stage = "$out",
 		.mutateFunc = &HandleOut,
@@ -620,6 +627,7 @@ static const AggregationStageDefinition StageDefinitions[] =
 		.allowBaseShardTablePushdown = false,
 		.stageEnum = Stage_Out,
 	},
+#endif
 	{
 		.stage = "$project",
 		.mutateFunc = &HandleProject,
@@ -912,6 +920,7 @@ CreateChangeStreamDocumentVar(void)
 /*
  * Creates a Var in the query representing the 'document' column of a documentdb_data table.
  */
+#if 0
 inline static Var *
 CreateChangeStreamContinuationtVar(void)
 {
@@ -924,7 +933,7 @@ CreateChangeStreamContinuationtVar(void)
 				   BsonTypeId(), DOCUMENT_DATA_TABLE_DOCUMENT_VAR_TYPMOD,
 				   DOCUMENT_DATA_TABLE_DOCUMENT_VAR_COLLATION, varlevelsup);
 }
-
+#endif
 
 /*
  * Helper function to limit the number of aggregation stages in a pipeline.
@@ -1332,12 +1341,14 @@ GenerateAggregationQuery(text *database, pgbson *aggregationSpec, QueryData *que
 		 */
 		addCursorParams = false;
 	}
+	#if 0
 	else if (query->commandType == CMD_MERGE)
 	{
 		/* CMD_MERGE is case when pipeline has output stage ($merge or $out) result will be always single batch. */
 		ThrowIfServerOrTransactionReadOnly();
 		queryData->cursorKind = QueryCursorType_SingleBatch;
 	}
+	#endif
 	else if (queryData->cursorKind == QueryCursorType_Unspecified)
 	{
 		queryData->cursorKind =
@@ -3787,7 +3798,6 @@ HandleChangeStream(const bson_value_t *existingValue, Query *query,
 	return query;
 }
 
-
 /*
  * Generates the projection functions expression for grouping stages e.g. $group, $setWindowFields
  * where the maximum number of arguments can be larger than MaxEvenFunctionArguments.
@@ -3822,7 +3832,7 @@ GenerateMultiExpressionRepathExpression(List *repathArgs, bool overrideArrayInPr
 	 *      ),
 	 * )
 	 */
-	List *args = list_copy_head(repathArgs, MaxEvenFunctionArguments);
+	List *args = list_truncate(list_copy(repathArgs), MaxEvenFunctionArguments); // list_copy_head(repathArgs, MaxEvenFunctionArguments);
 	List *remainingArgs = list_copy_tail(repathArgs, MaxEvenFunctionArguments);
 	Expr *argsRepathExpression = (Expr *) makeFuncExpr(BsonRepathAndBuildFunctionOid(),
 													   BsonTypeId(), args, InvalidOid,
@@ -4186,8 +4196,8 @@ CreateSingleArgAggregate(Oid aggregateFunctionId, Expr *argument, ParseState *pa
 	aggref->aggkind = AGGKIND_NORMAL; /* reset by planner */
 	/* aggref->agglevelsup = 0 / * > 0 if agg belongs to outer query * / */
 	aggref->aggsplit = AGGSPLIT_SIMPLE;
-	aggref->aggno = -1;     /* planner will set aggno and aggtransno */
-	aggref->aggtransno = -1;
+	// aggref->aggno = -1;     /* planner will set aggno and aggtransno */
+	// aggref->aggtransno = -1;
 	aggref->location = -1;
 	aggref->aggargtypes = list_make1_oid(BsonTypeId());
 
@@ -4386,8 +4396,8 @@ CreateMultiArgAggregate(Oid aggregateFunctionId, List *args, List *argTypes,
 	aggref->aggkind = AGGKIND_NORMAL; /* reset by planner */
 	/* aggref->agglevelsup = 0 / * > 0 if agg belongs to outer query * / */
 	aggref->aggsplit = AGGSPLIT_SIMPLE;
-	aggref->aggno = -1;     /* planner will set aggno and aggtransno */
-	aggref->aggtransno = -1;
+	// aggref->aggno = -1;     /* planner will set aggno and aggtransno */
+	// aggref->aggtransno = -1;
 	aggref->location = -1;
 	aggref->aggargtypes = argTypes;
 
@@ -5084,7 +5094,7 @@ AddMergeObjectsGroupAccumulator(Query *query, const bson_value_t *accumulatorVal
 	Const *nConst = makeConst(INT8OID, -1, InvalidOid, sizeof(int64_t),
 							  Int64GetDatum(INT_MAX), false, true);
 	ArrayType *arrayValue = construct_array(sortDatumArray, nelems, BsonTypeId(), -1,
-											false, TYPALIGN_INT);
+											false, 'i');
 
 	Const *sortArrayConst = makeConst(GetBsonArrayTypeOid(), -1, InvalidOid, -1,
 									  PointerGetDatum(arrayValue), false, false);
@@ -5223,7 +5233,7 @@ AddSortedGroupAccumulator(Query *query, const bson_value_t *accumulatorValue,
 	}
 
 	ArrayType *arrayValue = construct_array(sortDatumArray, nelems, BsonTypeId(), -1,
-											false, TYPALIGN_INT);
+											false, 'i');
 
 	Const *sortArrayConst = makeConst(GetBsonArrayTypeOid(), -1, InvalidOid, -1,
 									  PointerGetDatum(arrayValue), false, false);
@@ -5313,7 +5323,7 @@ AddSortedNGroupAccumulator(Query *query, const bson_value_t *input,
 	Const *nConst = makeConst(INT8OID, -1, InvalidOid, sizeof(int64_t),
 							  Int64GetDatum(elementsToFetch->value.v_int64), false, true);
 	ArrayType *arrayValue = construct_array(sortDatumArray, nelems, BsonTypeId(), -1,
-											false, TYPALIGN_INT);
+											false, 'i');
 	Const *sortArrayConst = makeConst(GetBsonArrayTypeOid(), -1, InvalidOid, -1,
 									  PointerGetDatum(arrayValue), false, false);
 	Aggref *aggref = CreateMultiArgAggregate(aggregateFunctionOid,
@@ -7300,6 +7310,9 @@ static void
 TryOptimizeAggregationPipelines(List **aggregationStages,
 								AggregationPipelineBuildContext *context)
 {
+	/* Disable optimization */
+	return;
+#if 0
 	List *stagesList = *aggregationStages;
 	if (stagesList == NIL || list_length(stagesList) == 0)
 	{
@@ -7374,4 +7387,5 @@ TryOptimizeAggregationPipelines(List **aggregationStages,
 	}
 
 	context->allowShardBaseTable = allowShardBaseTable;
+#endif
 }

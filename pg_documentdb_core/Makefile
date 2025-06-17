@@ -30,6 +30,7 @@ SOURCES = $(wildcard src/*.c) $(wildcard src/**/*.c)
 OBJS = $(patsubst %.c,%.o,$(SOURCES))
 
 DEBUG ?= no
+
 ifeq ($(DEBUG),yes)
   PG_CPPFLAGS += -ggdb -O0 -g
   PG_CFLAGS += -ggdb -O0 -g

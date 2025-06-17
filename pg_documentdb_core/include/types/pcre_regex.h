@@ -12,20 +12,20 @@
 #define PCRE_REGEX_H
 
 
-typedef struct PcreData PcreData;
+struct PcreData;
 
 void RegexCompileDuringPlanning(char *regexPatternStr, char *options);
-PcreData * RegexCompile(char *regexPatternStr, char *options);
-PcreData * RegexCompileForAggregation(char *regexPatternStr, char *options,
+struct PcreData * RegexCompile(char *regexPatternStr, char *options);
+struct PcreData * RegexCompileForAggregation(char *regexPatternStr, char *options,
 									  bool enableNoAutoCapture,
 									  const char *regexInvalidErrorMessage);
-size_t * GetResultVectorUsingPcreData(PcreData *pcreData);
-int GetResultLengthUsingPcreData(PcreData *pcreData);
+size_t * GetResultVectorUsingPcreData(struct PcreData *pcreData);
+int GetResultLengthUsingPcreData(struct PcreData *pcreData);
 bool IsValidRegexOptions(char *options);
-void FreePcreData(PcreData *pcreData);
+void FreePcreData(struct PcreData *pcreData);
 
 bool PcreRegexExecute(char *regexPatternStr, char *options,
-					  PcreData *pcreData,
+					  struct PcreData *pcreData,
 					  const StringView *subjectString);
 
 #endif

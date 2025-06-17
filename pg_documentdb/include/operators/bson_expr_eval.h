@@ -14,7 +14,7 @@
 #include "io/bson_core.h"
 #include <nodes/execnodes.h>
 
-typedef struct FuncExpr FuncExpr;
+struct FuncExpr;
 
 /*
  * State tracking necessary objects to evaluate a function
@@ -63,7 +63,7 @@ ExprEvalState * GetExpressionEvalStateWithCollation(const bson_value_t *expressi
 													MemoryContext memoryContext, const
 													char *collationString);
 
-ExprEvalState * GetExpressionEvalStateFromFuncExpr(const FuncExpr *expression,
+ExprEvalState * GetExpressionEvalStateFromFuncExpr(const struct FuncExpr *expression,
 												   MemoryContext memoryContext);
 
 ExprEvalState * GetExpressionEvalStateForBsonInput(const bson_value_t *expression,

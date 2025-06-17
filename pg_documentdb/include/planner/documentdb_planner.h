@@ -27,8 +27,7 @@ extern bool SimulateRecoveryState;
 extern bool DocumentDBPGReadOnlyForDiskFull;
 
 
-PlannedStmt * DocumentDBApiPlanner(Query *parse, const char *queryString, int
-								   cursorOptions,
+PlannedStmt * DocumentDBApiPlanner(Query *parse, int cursorOptions,
 								   ParamListInfo boundParams);
 void ExtensionRelPathlistHook(PlannerInfo *root, RelOptInfo *rel, Index rti,
 							  RangeTblEntry *rte);

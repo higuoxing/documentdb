@@ -1142,7 +1142,7 @@ bson_build_distinct_response(PG_FUNCTION_ARGS)
 	int val_count;
 
 	deconstruct_array(val_array,
-					  ARR_ELEMTYPE(val_array), -1, false, TYPALIGN_INT,
+					  ARR_ELEMTYPE(val_array), -1, false, 'i',
 					  &val_datums, &val_is_null_marker, &val_count);
 
 	/* Distinct never has SQL NULL in the array */

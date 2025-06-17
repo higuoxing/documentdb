@@ -584,11 +584,13 @@ JoinVectorSearchQueryWithFilterQuery(Query *leftQuery, Query *rightQuery,
 	joinRte->relid = InvalidOid;
 	joinRte->subquery = NULL;
 	joinRte->jointype = JOIN_INNER;
-	joinRte->joinmergedcols = 0; /* No using clause */
+	// joinRte->joinmergedcols = 0; /* No using clause */
 	joinRte->joinaliasvars = outputVars;
+#if 0
 	joinRte->joinleftcols = leftJoinCols;
 	joinRte->joinrightcols = rightJoinCols;
 	joinRte->join_using_alias = NULL;
+#endif
 	joinRte->alias = makeAlias("final_join", NIL);
 	joinRte->eref = makeAlias("final_join", outputColNames);
 	joinRte->inh = false; /* never true for joins */

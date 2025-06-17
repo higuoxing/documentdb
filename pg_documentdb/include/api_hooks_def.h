@@ -14,6 +14,7 @@
 #define EXTENSION_API_HOOKS_DEF_H
 
 #include "api_hooks_common.h"
+#include "vector/vector_spec.h"
 #include <access/amapi.h>
 #include <nodes/parsenodes.h>
 #include <nodes/pathnodes.h>
@@ -218,7 +219,6 @@ extern GetMultiAndBitmapIndexFunc_HookType get_multi_and_bitmap_func_hook;
 /*
  * Hook for customizing the validation of vector query spec.
  */
-typedef struct VectorSearchOptions VectorSearchOptions;
 typedef void
 (*TryCustomParseAndValidateVectorQuerySpec_HookType)(const char *key,
 													 const bson_value_t *value,

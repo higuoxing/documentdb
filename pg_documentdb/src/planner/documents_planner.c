@@ -123,7 +123,7 @@ explain_get_index_name_hook_type ExtensionPreviousIndexNameHook = NULL;
  * to the planner.
  */
 PlannedStmt *
-DocumentDBApiPlanner(Query *parse, const char *queryString, int cursorOptions,
+DocumentDBApiPlanner(Query *parse, int cursorOptions,
 					 ParamListInfo boundParams)
 {
 	bool hasUnresolvedParams = false;

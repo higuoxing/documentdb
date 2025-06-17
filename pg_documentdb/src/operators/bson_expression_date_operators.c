@@ -2570,7 +2570,9 @@ static int
 WriteInt32AndAdvanceBuffer(char **buffer, const char *end, int32_t value)
 {
 	char tmp[12]; /* We need at least 12 bytes for a signed int32 string. */
-	int length = pg_ltoa(value, tmp);
+	int length;
+	pg_ltoa(value, tmp);
+	length = strlen(tmp);
 
 	if ((*buffer + length) > end)
 	{

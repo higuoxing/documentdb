@@ -15,6 +15,7 @@
 
 #include "api_hooks_common.h"
 #include "metadata/collection.h"
+#include "vector/vector_spec.h"
 
 /* Section: General Extension points */
 
@@ -203,7 +204,6 @@ void * GetMultiAndBitmapIndexFunc(bool missingOk);
 /*
  * Hook for customizing the validation of vector query spec.
  */
-typedef struct VectorSearchOptions VectorSearchOptions;
 void TryCustomParseAndValidateVectorQuerySpec(const char *key,
 											  const bson_value_t *value,
 											  VectorSearchOptions *vectorSearchOptions);

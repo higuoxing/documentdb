@@ -16,9 +16,9 @@
 #define MISSING_TYPE_NAME "missing"
 #define MISSING_VALUE_NAME "MISSING"
 
-typedef struct ExpressionResult ExpressionResult;
-typedef struct BsonIntermediatePathNode BsonIntermediatePathNode;
-typedef struct AggregationExpressionData AggregationExpressionData;
+struct ExpressionResult;
+struct BsonIntermediatePathNode;
+struct AggregationExpressionData;
 
 /*
  * A struct that defines the value for a specific variable
@@ -34,7 +34,7 @@ typedef struct
 	/* A union which holds either the constant value or the expression data. */
 	union
 	{
-		AggregationExpressionData *expression;
+		struct AggregationExpressionData *expression;
 		bson_value_t bsonValue;
 	};
 } VariableData;
@@ -62,11 +62,11 @@ typedef struct ExpressionVariableContext
 
 /* Func that will handle evaluating a given operator on a document. */
 typedef void (*LegacyEvaluateOperator)(pgbson *doc, const bson_value_t *operatorValue,
-									   ExpressionResult *writer);
+									   struct ExpressionResult *writer);
 
 /* Func that handles evaluating a preparsed operator on a given document. */
 typedef void (*HandlePreParsedOperatorFunc)(pgbson *doc, void *arguments,
-											ExpressionResult *expressionResult);
+											struct ExpressionResult *expressionResult);
 
 /* Enum that defines the kind of an aggregation expression. */
 typedef enum AggregationExpressionKind
@@ -163,7 +163,7 @@ typedef struct AggregationExpressionData
 		bson_value_t value;
 
 		/* The root node for a tree representing a document or array expression (which are not constant values). */
-		const BsonIntermediatePathNode *expressionTree;
+		const struct BsonIntermediatePathNode *expressionTree;
 
 		/* A struct containing the data for an operator expression in order to evaluate the operator. */
 		struct

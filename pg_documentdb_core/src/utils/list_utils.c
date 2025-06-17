@@ -20,8 +20,8 @@
 #include "utils/list_utils.h"
 
 
-static int StringListComparator(const ListCell *leftListCell,
-								const ListCell *rightListCell);
+static int StringListComparator(const void *leftListCell,
+								const void *rightListCell);
 
 
 /*
@@ -54,7 +54,7 @@ StringListJoin(const List *stringList, const char *delim)
 void
 SortStringList(List *stringList)
 {
-	list_sort(stringList, StringListComparator);
+	list_qsort(stringList, StringListComparator);
 }
 
 
@@ -62,9 +62,9 @@ SortStringList(List *stringList)
  * StringListComparator compares two string list cells using strcmp().
  */
 static int
-StringListComparator(const ListCell *leftListCell, const ListCell *rightListCell)
+StringListComparator(const void *leftListCell, const void *rightListCell)
 {
-	return strcmp(lfirst(leftListCell), lfirst(rightListCell));
+	return strcmp(lfirst(*(ListCell **)leftListCell), lfirst(*(ListCell **)rightListCell));
 }
 
 
@@ -162,7 +162,7 @@ IntListGetPgIntArray(const List *intList)
 
 	bool elmbyval = true;
 	return construct_array(intDatumArray, nelems, INT4OID, sizeof(int),
-						   elmbyval, TYPALIGN_INT);
+						   elmbyval, 'i');
 }
 
 

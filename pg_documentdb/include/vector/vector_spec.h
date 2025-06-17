@@ -15,7 +15,8 @@
 
 #include "io/bson_core.h"
 
-typedef struct VectorIndexDefinition VectorIndexDefinition;
+typedef double Cardinality;
+struct VectorIndexDefinition;
 
 /*
  * The distance metric for a vector based index.
@@ -123,7 +124,7 @@ typedef struct VectorSearchOptions
 	bool exactSearch;
 
 	/* The vector index definition */
-	const VectorIndexDefinition *vectorIndexDef;
+	const struct VectorIndexDefinition *vectorIndexDef;
 
 	/* Over sample rate */
 	double oversampling;

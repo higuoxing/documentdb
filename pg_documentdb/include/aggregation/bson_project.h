@@ -18,13 +18,13 @@
 extern PGDLLIMPORT const StringView IdFieldStringView;
 
 /* Forward declare the pointer type ( no need to expose the struct layout) */
-typedef struct BsonProjectionQueryState BsonProjectionQueryState;
-typedef struct BsonProjectDocumentFunctions BsonProjectDocumentFunctions;
+struct BsonProjectionQueryState;
+struct BsonProjectDocumentFunctions;
 
-typedef struct ProjectDocumentState ProjectDocumentState;
+struct ProjectDocumentState;
 
 typedef bool (*TryHandleIntermediateArrayNodeFunc)(const BsonIntermediatePathNode *node,
-												   ProjectDocumentState *state,
+												   struct ProjectDocumentState *state,
 												   bson_iter_t *sourceValue);
 
 typedef void *(*InitializePendingProjectionStateFunc)(uint32_t totalPendingProjections);
@@ -123,22 +123,22 @@ typedef struct ProjectDocumentState
 	bool skipIntermediateArrayFields;
 } ProjectDocumentState;
 
-const BsonProjectionQueryState * GetProjectionStateForBsonProject(
+const struct BsonProjectionQueryState * GetProjectionStateForBsonProject(
 	bson_iter_t *projectionSpecIter,
 	bool forceProjectId,
 	bool
 	allowInclusionExclusion);
 
-const BsonProjectionQueryState * GetProjectionStateForBsonAddFields(
+const struct BsonProjectionQueryState * GetProjectionStateForBsonAddFields(
 	bson_iter_t *projectionSpecIter);
-const BsonProjectionQueryState * GetProjectionStateForBsonUnset(const bson_value_t *
+const struct BsonProjectionQueryState * GetProjectionStateForBsonUnset(const bson_value_t *
 																unsetValue,
 																bool forceProjectId);
 void GetBsonValueForReplaceRoot(bson_iter_t *replaceRootIterator, bson_value_t *value);
 
 
 pgbson * ProjectDocumentWithState(pgbson *sourceDocument,
-								  const BsonProjectionQueryState *state);
+								  const struct BsonProjectionQueryState *state);
 pgbson * ProjectReplaceRootDocument(pgbson *document,
 									const AggregationExpressionData *replaceRootExpression,
 									const ExpressionVariableContext *variableContext,

@@ -46,7 +46,7 @@ _PG_init(void)
 
 	InitializeDocumentDBDistributedHooks();
 	InitDocumentDBDistributedConfigurations("documentdb_distributed");
-	MarkGUCPrefixReserved("documentdb_distributed");
+	// MarkGUCPrefixReserved("documentdb_distributed");
 }
 
 

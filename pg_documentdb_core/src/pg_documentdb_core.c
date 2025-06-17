@@ -43,7 +43,7 @@ _PG_init(void)
 
 	InitDocumentDBCoreConfigurations("documentdb_core");
 
-	MarkGUCPrefixReserved("documentdb_core");
+	// MarkGUCPrefixReserved("documentdb_core");
 	ereport(LOG, (errmsg("Initialized documentdb_core extension")));
 }
 

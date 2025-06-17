@@ -32,7 +32,7 @@
 #include <catalog/pg_aggregate.h>
 #include <catalog/pg_class.h>
 #include <catalog/namespace.h>
-#include <rewrite/rewriteSearchCycle.h>
+// #include <rewrite/rewriteSearchCycle.h>
 #include <utils/version_utils.h>
 #include <executor/spi.h>
 
@@ -127,9 +127,10 @@ extern bool EnableCollation;
 
 /* GUC to enable schema validation */
 extern bool EnableSchemaValidation;
-
+#if 0
 static void ParseMergeStage(const bson_value_t *existingValue, const
 							char *currentNameSpace, MergeArgs *args);
+
 static void ParseOutStage(const bson_value_t *existingValue, const char *currentNameSpace,
 						  OutArgs *args);
 static void VaildateMergeOnFieldValues(const bson_value_t *onArray, uint64
@@ -147,6 +148,8 @@ static void WriteJoinConditionToQueryDollarMerge(Query *query,
 												 sourceExtractedOnFieldsInitIndex,
 												 const int sourceCollectionVarNo,
 												 MergeArgs mergeArgs);
+#endif
+#if 0
 static MergeAction * MakeActionWhenMatched(WhenMatchedAction whenMatched,
 										   Var *sourceDocVar,
 										   Var *targetDocVar,
@@ -161,9 +164,11 @@ static MergeAction * MakeActionWhenNotMatched(WhenNotMatchedAction whenNotMatche
 static bool IsCompoundUniqueIndexPresent(const bson_value_t *onValues,
 										 bson_iter_t *indexKeyDocumentIter,
 										 const int numElementsInMap);
+#endif
 static void ValidateAndAddObjectIdToWriter(pgbson_writer *writer,
 										   pgbson *sourceDocument,
 										   pgbson *targetDocument);
+#if 0
 static inline bool IsSingleUniqueIndexPresent(const char *onValue,
 											  bson_iter_t *indexKeyDocumentIter);
 static inline void AddTargetCollectionRTEDollarMerge(Query *query,
@@ -172,12 +177,14 @@ static HTAB * InitHashTableFromStringArray(const bson_value_t *onValues, int
 										   onValuesArraySize);
 static inline bool ValidatePreOutputStages(Query *query);
 static bool MergeQueryCTEWalker(Node *node, void *context);
+#endif
 static inline void ValidateFinalPgbsonBeforeWriting(const pgbson *finalBson, const
 													pgbson *targetDocument,
 													ExprEvalState *
 													stateForSchemaValidation,
 													ValidationLevels
 													validationLevel);
+#if 0
 static inline Expr * CreateSingleJoinExpr(const char *joinField,
 										  Var *sourceDocVar,
 										  Var *targetDocVar,
@@ -188,6 +195,7 @@ static inline TargetEntry * MakeExtractFuncExprForMergeTE(const char *onField, u
 														  length, Var *sourceDocument,
 														  const int resNum);
 static void TruncateDataTable(int collectionId);
+#endif
 static inline bool CheckSchemaValidationEnabledForDollarMergeOut(void);
 
 PG_FUNCTION_INFO_V1(bson_dollar_merge_handle_when_matched);
@@ -608,6 +616,7 @@ bson_dollar_merge_fail_when_not_matched(PG_FUNCTION_ARGS)
  * COALESCE(bson_get_value(agg_stage_0.document, '_id'::text), agg_stage_0.generated_object_id), bson_dollar_merge_add_object_id(agg_stage_0.document, agg_stage_0.generated_object_id, '{ "a" : { "$type" : "int" } }'::bson), '2024-12-16 10:00:57.196789+00'::timestamp with time zone);
  *
  */
+#if 0
 Query *
 HandleMerge(const bson_value_t *existingValue, Query *query,
 			AggregationPipelineBuildContext *context)
@@ -772,7 +781,7 @@ HandleMerge(const bson_value_t *existingValue, Query *query,
 										 mergeArgs);
 	return query;
 }
-
+#endif
 
 /*
  * create MergeAction for `whenMatched` case.
@@ -780,6 +789,7 @@ HandleMerge(const bson_value_t *existingValue, Query *query,
  * WHEN MATCHED THEN
  * UPDATE SET document = bson_dollar_merge_handle_when_matched(agg_stage_4.document, documents_1.document, 0, '{ "a" : { "$type" : "int" } }'::bson, 1)
  */
+#if 0
 static MergeAction *
 MakeActionWhenMatched(WhenMatchedAction whenMatched, Var *sourceDocVar, Var *targetDocVar,
 					  Const *schemaValidatorInfoConst, Const *validationLevelConst)
@@ -822,7 +832,7 @@ MakeActionWhenMatched(WhenMatchedAction whenMatched, Var *sourceDocVar, Var *tar
 		);
 	return action;
 }
-
+#endif
 
 /*
  * create MergeAction for `whenNotMatched` case
@@ -834,6 +844,7 @@ MakeActionWhenMatched(WhenMatchedAction whenMatched, Var *sourceDocVar, Var *tar
  *        source.document), bson_dollar_merge_add_object_id(source.document, generated_object_id, schema_validator_info),
  *        <current-time>)
  */
+#if 0
 static MergeAction *
 MakeActionWhenNotMatched(WhenNotMatchedAction whenNotMatched, Var *sourceDocVar,
 						 Var *generatedObjectIdVar,
@@ -919,7 +930,7 @@ MakeActionWhenNotMatched(WhenNotMatchedAction whenNotMatched, Var *sourceDocVar,
 
 	return action;
 }
-
+#endif
 
 /*
  * Parses & validates the input $merge spec.
@@ -934,6 +945,7 @@ MakeActionWhenNotMatched(WhenNotMatchedAction whenNotMatched, Var *sourceDocVar,
  *
  * Parsed outputs are placed in the MergeArgs struct.
  */
+#if 0
 static void
 ParseMergeStage(const bson_value_t *existingValue, const char *currentNameSpace,
 				MergeArgs *args)
@@ -1234,7 +1246,7 @@ ParseMergeStage(const bson_value_t *existingValue, const char *currentNameSpace,
 		args->on.value.v_utf8.str = "_id";
 	}
 }
-
+#endif
 
 /*
  * Before $merge stage for existing query we need to modify target list for :
@@ -1251,6 +1263,7 @@ ParseMergeStage(const bson_value_t *existingValue, const char *currentNameSpace,
  * TODO : if source and target collection are same we need to add actual shard_key_value column to the query but need to be careful when there are nested stages
  *        this optimization will help when both collection are sharded so we should do when we support target sharded collection.
  */
+#if 0
 static void
 RearrangeTargetListForMerge(Query *query, MongoCollection *targetCollection,
 							bool isSourceAndTargetAreSame,
@@ -1352,9 +1365,10 @@ RearrangeTargetListForMerge(Query *query, MongoCollection *targetCollection,
 
 	query->targetList = newTargetList;
 }
-
+#endif
 
 /* This function creates an target entry for bson_dollar_extract_merge_filter */
+#if 0
 static inline TargetEntry *
 MakeExtractFuncExprForMergeTE(const char *onField, uint32 length, Var *sourceDocument,
 							  const int resNum)
@@ -1375,11 +1389,12 @@ MakeExtractFuncExprForMergeTE(const char *onField, uint32 length, Var *sourceDoc
 												 false);
 	return extractFuncTE;
 }
-
+#endif
 
 /*
  * Add target collection to the query for $merge aggregation stage.
  */
+#if 0
 static inline void
 AddTargetCollectionRTEDollarMerge(Query *query, MongoCollection *targetCollection)
 {
@@ -1414,7 +1429,7 @@ AddTargetCollectionRTEDollarMerge(Query *query, MongoCollection *targetCollectio
 #endif
 	query->targetList = NIL;
 }
-
+#endif
 
 /*
  * write join condition to the query Tree for $merge aggregation stage.
@@ -1426,6 +1441,7 @@ AddTargetCollectionRTEDollarMerge(Query *query, MongoCollection *targetCollectio
  * AND bson_dollar_merge_join(target.document, source.docuemnt, 'a'::text)
  * AND bson_dollar_merge_join(target.document, source.docuemnt, 'b'::text)
  */
+#if 0
 static void
 WriteJoinConditionToQueryDollarMerge(Query *query,
 									 Var *sourceDocVar,
@@ -1496,7 +1512,7 @@ WriteJoinConditionToQueryDollarMerge(Query *query,
 	query->jointree->quals = (Node *) make_ands_explicit(joinFilterList);
 #endif
 }
-
+#endif
 
 /*
  * In the $merge query, users can specify multiple "on" conditions. We handle them in two ways:
@@ -1504,6 +1520,7 @@ WriteJoinConditionToQueryDollarMerge(Query *query,
  * 2. For any other field, we create an expression: bson_dollar_merge_join(target.document, sourceDocVar.document, "joinfield").
  * The bson_dollar_merge_join function is used to support function for index pushdown, which replaces the function expression with an operator expression.
  */
+#if 0
 static inline Expr *
 CreateSingleJoinExpr(const char *joinField,
 					 Var *sourceDocVar,
@@ -1542,7 +1559,7 @@ CreateSingleJoinExpr(const char *joinField,
 
 	return singleJoinExpr;
 }
-
+#endif
 
 /*
  * In the $merge stage, we want to fail if the `on` fields specified in the input do not have a unique index in the target collection.
@@ -1554,6 +1571,7 @@ CreateSingleJoinExpr(const char *joinField,
  * For example, if `on` is "a", we want to ensure that the target collection has a unique index on the field 'a'.
  * If `on` is "[a,b]", we want to ensure that the target collection has a compound unique index on the fields 'a' and 'b'.
  */
+#if 0
 static void
 VaildateMergeOnFieldValues(const bson_value_t *onValues, uint64 collectionId)
 {
@@ -1643,7 +1661,7 @@ VaildateMergeOnFieldValues(const bson_value_t *onValues, uint64 collectionId)
 							"Cannot find index to verify that join fields will be unique")));
 	}
 }
-
+#endif
 
 /*
  * Checks if a unique index is present for the given field.
@@ -1663,6 +1681,7 @@ VaildateMergeOnFieldValues(const bson_value_t *onValues, uint64 collectionId)
  * Returns:
  * - true if a unique index is present for the given fields, false otherwise.
  */
+#if 0
 static inline bool
 IsSingleUniqueIndexPresent(const char *onValue, bson_iter_t *indexKeyDocumentIter)
 {
@@ -1680,7 +1699,7 @@ IsSingleUniqueIndexPresent(const char *onValue, bson_iter_t *indexKeyDocumentIte
 
 	return false;
 }
-
+#endif
 
 /*
  * Checks if a compound unique index is present for the given fields.
@@ -1700,6 +1719,7 @@ IsSingleUniqueIndexPresent(const char *onValue, bson_iter_t *indexKeyDocumentIte
  * Returns:
  * - true if a compound unique index is present for the given fields, false otherwise.
  */
+#if 0
 static bool
 IsCompoundUniqueIndexPresent(const bson_value_t *onValues,
 							 bson_iter_t *indexKeyDocumentIter,
@@ -1734,7 +1754,7 @@ IsCompoundUniqueIndexPresent(const bson_value_t *onValues,
 
 	return true;
 }
-
+#endif
 
 /*
  * Initializes a hash table from a string array.
@@ -1749,6 +1769,7 @@ IsCompoundUniqueIndexPresent(const bson_value_t *onValues,
  * Returns:
  * - A pointer to the newly created hash table.
  */
+#if 0
 static HTAB *
 InitHashTableFromStringArray(const bson_value_t *inputKeyArray, int arraySize)
 {
@@ -1779,11 +1800,12 @@ InitHashTableFromStringArray(const bson_value_t *inputKeyArray, int arraySize)
 
 	return hashTable;
 }
-
+#endif
 
 /*
  * ValidatePreOutputStages traverse query tree to fail early if $merge/$out is used with $graphLookup or contains any mutable function.
  */
+#if 0
 static inline bool
 ValidatePreOutputStages(Query *query)
 {
@@ -1799,11 +1821,12 @@ ValidatePreOutputStages(Query *query)
 
 	return query_tree_walker(query, MergeQueryCTEWalker, NULL, 0);
 }
-
+#endif
 
 /*
  * MergeQueryCTEWalker descends into the MERGE query to check for any subqueries
  */
+#if 0
 static bool
 MergeQueryCTEWalker(Node *node, void *context)
 {
@@ -1833,7 +1856,7 @@ MergeQueryCTEWalker(Node *node, void *context)
 
 	return expression_tree_walker(node, MergeQueryCTEWalker, context);
 }
-
+#endif
 
 /* let's validate final pgbson before writing to collection */
 static inline void
@@ -1941,6 +1964,7 @@ ValidateAndAddObjectIdToWriter(pgbson_writer *writer,
  *    THEN INSERT (shard_key_value, object_id, document, creation_time)
  *     VALUES (agg_stage_0.target_shard_key_value, COALESCE(bson_get_value(agg_stage_0.document, '_id'::text), agg_stage_0.generated_object_id), ApiInternalSchemaName.bson_dollar_merge_add_object_id(agg_stage_0.document, agg_stage_0.generated_object_id, '{ "a" : { "$type" : "int" } }'::bson), '2024-08-21 11:06:38.323204+00'::timestamp with time zone)
  */
+#if 0
 Query *
 HandleOut(const bson_value_t *existingValue, Query *query,
 		  AggregationPipelineBuildContext *context)
@@ -2064,11 +2088,12 @@ HandleOut(const bson_value_t *existingValue, Query *query,
 #endif
 	return query;
 }
-
+#endif
 
 /*
  * Truncate data table corresponding to the input collection id.
  */
+#if 0
 static void
 TruncateDataTable(int collectionId)
 {
@@ -2082,7 +2107,7 @@ TruncateDataTable(int collectionId)
 	bool readOnly = false;
 	ExtensionExecuteQueryViaSPI(cmdStr->data, readOnly, SPI_OK_UTILITY, &isNull);
 }
-
+#endif
 
 /*
  * Parses & validates the input $out spec.
@@ -2091,6 +2116,7 @@ TruncateDataTable(int collectionId)
  *
  * Parsed outputs are placed in the OutArgs struct.
  */
+#if 0
 static void
 ParseOutStage(const bson_value_t *existingValue, const char *currentNameSpace,
 			  OutArgs *args)
@@ -2174,7 +2200,7 @@ ParseOutStage(const bson_value_t *existingValue, const char *currentNameSpace,
 							"If an object is passed to $out it must have exactly 2 fields: 'db' and 'coll'")));
 	}
 }
-
+#endif
 
 /* check whether to perform schema validation in stage $merge/$out */
 static inline bool

@@ -47,7 +47,7 @@ _PG_init(void)
 	InstallBsonMemVTables();
 	InitApiConfigurations("documentdb", "documentdb");
 	InitializeSharedMemoryHooks();
-	MarkGUCPrefixReserved("documentdb");
+	// MarkGUCPrefixReserved("documentdb");
 	InitializeDocumentDBBackgroundWorker("pg_documentdb", "documentdb", "documentdb");
 
 	InstallDocumentDBApiPostgresHooks();

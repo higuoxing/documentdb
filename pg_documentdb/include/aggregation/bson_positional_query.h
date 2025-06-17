@@ -11,8 +11,6 @@
 #ifndef BSON_POSITIONAL_QUERY_H
 #define BSON_POSITIONAL_QUERY_H
 
-typedef struct BsonPositionalQueryData BsonPositionalQueryData;
-
 /*
  * A list of BsonPositionalQueryQual for each
  * qualifier found within a top level query.

@@ -30,7 +30,7 @@
 
 
 /* Forward declaration of struct */
-typedef struct ProcessCommonGeospatialState ProcessCommonGeospatialState;
+struct ProcessCommonGeospatialState;
 
 
 /*================================*/
@@ -38,7 +38,7 @@ typedef struct ProcessCommonGeospatialState ProcessCommonGeospatialState;
 /*================================*/
 
 /* Forward declaration of struct */
-typedef struct ProcessCommonGeospatialState ProcessCommonGeospatialState;
+struct ProcessCommonGeospatialState;
 
 /*
  * Types of validation performed when processing the geospatial data
@@ -113,7 +113,7 @@ typedef struct CommonBsonGeospatialState
 } CommonBsonGeospatialState;
 
 /* Signature for runtime function to get match result for $geoWithin and $geoIntersects */
-typedef bool (*GeospatialQueryMatcherFunc)(const ProcessCommonGeospatialState *,
+typedef bool (*GeospatialQueryMatcherFunc)(const struct ProcessCommonGeospatialState *,
 										   StringInfo);
 
 /*

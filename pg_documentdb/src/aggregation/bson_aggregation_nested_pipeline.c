@@ -31,7 +31,7 @@
 #include <utils/builtins.h>
 #include <catalog/pg_aggregate.h>
 #include <catalog/pg_class.h>
-#include <rewrite/rewriteSearchCycle.h>
+// #include <rewrite/rewriteSearchCycle.h>
 #include <utils/version_utils.h>
 
 #include "io/bson_core.h"
@@ -266,9 +266,12 @@ static Query * ProcessLookupCoreWithLet(Query *query,
 										LookupArgs *lookupArgs,
 										LookupContext *lookupContext);
 static void ValidatePipelineForShardedLookupWithLet(const bson_value_t *pipeline);
+#if 0
 static Query * ProcessGraphLookupCore(Query *query,
 									  AggregationPipelineBuildContext *context,
 									  GraphLookupArgs *lookupArgs);
+#endif
+#if 0
 static Query * BuildGraphLookupCteQuery(QuerySource parentSource,
 										CommonTableExpr *baseCteExpr,
 										GraphLookupArgs *args,
@@ -278,6 +281,7 @@ static Query * BuildRecursiveGraphLookupQuery(QuerySource parentSource,
 											  AggregationPipelineBuildContext *
 											  parentContext,
 											  CommonTableExpr *baseCteExpr, int levelsUp);
+#endif
 static void ValidateUnionWithPipeline(const bson_value_t *pipeline, bool hasCollection);
 
 static void ValidateLetHasNoVariables(AggregationExpressionData *parsedData);
@@ -536,6 +540,7 @@ CanInlineLookupWithUnwind(const bson_value_t *lookUpStageValue,
 /*
  * Top level method handling processing of the $graphLookup Stage.
  */
+#if 0
 Query *
 HandleGraphLookup(const bson_value_t *existingValue, Query *query,
 				  AggregationPipelineBuildContext *context)
@@ -548,7 +553,7 @@ HandleGraphLookup(const bson_value_t *existingValue, Query *query,
 
 	return ProcessGraphLookupCore(query, context, &graphArgs);
 }
-
+#endif
 
 /*
  * Top level method handling processing of the $documents stage.
@@ -1898,11 +1903,13 @@ MakeLookupJoinRte(List *joinVars, List *colNames, List *joinLeftCols, List *join
 	joinRte->relid = InvalidOid;
 	joinRte->subquery = NULL;
 	joinRte->jointype = JOIN_LEFT;
-	joinRte->joinmergedcols = 0; /* No using clause */
+	// joinRte->joinmergedcols = 0; /* No using clause */
 	joinRte->joinaliasvars = joinVars;
+	#if 0
 	joinRte->joinleftcols = joinLeftCols;
 	joinRte->joinrightcols = joinRightCols;
 	joinRte->join_using_alias = NULL;
+	#endif
 	joinRte->alias = makeAlias("lookup_join", colNames);
 	joinRte->eref = joinRte->alias;
 	joinRte->inh = false;           /* never true for joins */
@@ -2773,7 +2780,7 @@ ProcessLookupCoreWithLet(Query *query, AggregationPipelineBuildContext *context,
 		if (lookupContext->preserveNullAndEmptyArrays)
 		{
 			Expr *coalesceExpr = GetEmptyBsonCoalesce(rightDocExpr);
-			list_nth_cell(mergeDocumentsArgs, 1)->ptr_value = coalesceExpr;
+			list_nth_cell(mergeDocumentsArgs, 1)->data.ptr_value = coalesceExpr;
 		}
 		else
 		{
@@ -3195,6 +3202,7 @@ ParseGraphLookupStage(const bson_value_t *existingValue, GraphLookupArgs *args)
  * or bson_expression_get(document, '{ "connectToField": { "$makeArray": "$inputExpression" } }', collationString ),
  * if a valid collation string is provided.
  */
+#if 0
 static FuncExpr *
 BuildInputExpressionForQuery(Expr *origExpr, const StringView *connectToField, const
 							 bson_value_t *inputExpression,
@@ -3248,7 +3256,7 @@ BuildInputExpressionForQuery(Expr *origExpr, const StringView *connectToField, c
 
 	return inputFuncExpr;
 }
-
+#endif
 
 /*
  * Adds input expression query to the input query projection list. This is the expression
@@ -3259,6 +3267,7 @@ BuildInputExpressionForQuery(Expr *origExpr, const StringView *connectToField, c
  * AS "inputExpr",
  * if a collation string is provided.
  */
+#if 0
 static AttrNumber
 AddInputExpressionToQuery(Query *query, StringView *fieldName, const
 						  bson_value_t *inputExpression,
@@ -3283,7 +3292,7 @@ AddInputExpressionToQuery(Query *query, StringView *fieldName, const
 
 	return expressionResultNumber;
 }
-
+#endif
 
 /*
  * Core handling for a graph lookup query.
@@ -3334,6 +3343,7 @@ AddInputExpressionToQuery(Query *query, StringView *fieldName, const
  * SELECT bson_dollar_add_fields(document, addFields) FROM graphLookupStage;
  *
  */
+#if 0
 static Query *
 ProcessGraphLookupCore(Query *query, AggregationPipelineBuildContext *context,
 					   GraphLookupArgs *lookupArgs)
@@ -3404,12 +3414,13 @@ ProcessGraphLookupCore(Query *query, AggregationPipelineBuildContext *context,
 
 	return graphLookupQuery;
 }
-
+#endif
 
 /*
  * This builds the the caller of the recursive CTE for a graphLookup
  * For the structure of this query, see ProcessGraphLookupCore
  */
+#if 0
 static Query *
 BuildGraphLookupCteQuery(QuerySource parentSource,
 						 CommonTableExpr *baseCteExpr,
@@ -3462,11 +3473,12 @@ BuildGraphLookupCteQuery(QuerySource parentSource,
 	graphLookupQuery->targetList = list_make2(firstEntry, secondEntry);
 	return graphLookupQuery;
 }
-
+#endif
 
 /*
  * Creates an expression for bson_expression_get(document, '{ "_id": "$_id"}', true)
  */
+#if 0
 static Expr *
 CreateIdProjectionExpr(Expr *baseExpr)
 {
@@ -3482,13 +3494,14 @@ CreateIdProjectionExpr(Expr *baseExpr)
 																		&expressionElement))),
 								 InvalidOid, InvalidOid, COERCE_EXPLICIT_CALL);
 }
-
+#endif
 
 /*
  * This is the base case for the recursive CTE. This scans the from collection
  * with the equality match on the original table's rows.
  * SELECT * FROm from_collection WHERE document #= '{ "inputExpression" }
  */
+#if 0
 static Query *
 GenerateBaseCaseQuery(AggregationPipelineBuildContext *parentContext,
 					  GraphLookupArgs *args, int baseCteLevelsUp)
@@ -3583,12 +3596,13 @@ GenerateBaseCaseQuery(AggregationPipelineBuildContext *parentContext,
 
 	return baseCaseQuery;
 }
-
+#endif
 
 /*
  * This is the recursive lookup case. This is equivalent to searching equality from the prior round
  * SELECT * FROm from_collection WHERE document #= '{ "previousFromExpr" }
  */
+#if 0
 static Query *
 GenerateRecursiveCaseQuery(AggregationPipelineBuildContext *parentContext,
 						   CommonTableExpr *recursiveCte,
@@ -3723,11 +3737,12 @@ GenerateRecursiveCaseQuery(AggregationPipelineBuildContext *parentContext,
 
 	return recursiveQuery;
 }
-
+#endif
 
 /*
  * Walker to replace the recursive graph CTE post cycle rewrite.
  */
+#if 0
 static bool
 RewriteGraphLookupRecursiveCteExprWalker(Node *node, CommonTableExpr *graphRecursiveCte)
 {
@@ -3759,12 +3774,13 @@ RewriteGraphLookupRecursiveCteExprWalker(Node *node, CommonTableExpr *graphRecur
 
 	return false;
 }
-
+#endif
 
 /*
  * This builds the core recursive CTE for a graphLookup
  * For the structure of this query, see ProcessGraphLookupCore
  */
+#if 0
 static Query *
 BuildRecursiveGraphLookupQuery(QuerySource parentSource, GraphLookupArgs *args,
 							   AggregationPipelineBuildContext *parentContext,
@@ -3973,7 +3989,7 @@ BuildRecursiveGraphLookupQuery(QuerySource parentSource, GraphLookupArgs *args,
 	pfree(parseState);
 	return graphLookupQuery;
 }
-
+#endif
 
 static Query *
 HandleLookupCore(const bson_value_t *existingValue, Query *query,
