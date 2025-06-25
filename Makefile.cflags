@@ -1,6 +1,6 @@
 
 
-LIBBSON := $(shell pkg-config --cflags libbson-static-1.0)
+LIBBSON := $(shell pkg-config --cflags --libs libbson-1.0)
 INTEL_DECIMAL_MATH_LIB = $(shell pkg-config --cflags intelmathlib)
 PCRE2_LIB = $(shell pkg-config --cflags libpcre2-8)
 

@@ -274,14 +274,18 @@ BsonValueToJsonForLogging(const bson_value_t *value)
 
 		case BSON_TYPE_INT32:
 		{
-			int strLength = pg_ltoa(value->value.v_int32, numBuffer);
+			int strLength;
+			pg_ltoa(value->value.v_int32, numBuffer);
+			strLength = strlen(numBuffer);
 			returnValue = pnstrdup(numBuffer, strLength);
 			break;
 		}
 
 		case BSON_TYPE_INT64:
 		{
-			int strLength = pg_lltoa(value->value.v_int64, numBuffer);
+			int strLength;
+			pg_lltoa(value->value.v_int64, numBuffer);
+			strLength = strlen(numBuffer);
 			returnValue = pnstrdup(numBuffer, strLength);
 			break;
 		}
@@ -449,7 +453,7 @@ PgbsonToLegacyJson(const pgbson *bsonDocument)
 	}
 
 	/* since bson strings are palloced - we can simply return the string created. */
-	return bson_as_json(&bson, NULL);
+	return bson_as_legacy_extended_json(&bson, NULL);
 }
 
 

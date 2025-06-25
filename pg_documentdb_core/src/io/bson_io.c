@@ -536,17 +536,19 @@ PgbsonElementWriterWriteSQLValue(pgbson_element_writer *writer,
 	{
 		/* array type */
 		ArrayType *val_array = DatumGetArrayTypeP(fieldValue);
-
+		int16		elemlen;
+		bool		elembyval;
+		char		elemalign;
 		Datum *val_datums;
 		bool *val_is_null_marker;
 		int val_count;
 
-		bool arrayByVal = false;
-		int elementLength = -1;
 		Oid arrayElementType = ARR_ELEMTYPE(val_array);
+		get_typlenbyvalalign(ARR_ELEMTYPE(val_array),
+				     &elemlen, &elembyval, &elemalign);
 		deconstruct_array(val_array,
-						  arrayElementType, elementLength, arrayByVal,
-						  TYPALIGN_INT, &val_datums, &val_is_null_marker,
+						  arrayElementType, elemlen, elembyval,
+						  elemalign, &val_datums, &val_is_null_marker,
 						  &val_count);
 
 		pgbson_array_writer arrayWriter;
@@ -657,12 +659,14 @@ PgbsonElementWriterWriteSQLValue(pgbson_element_writer *writer,
 		case NUMERICOID:
 		{
 			Numeric num = DatumGetNumeric(fieldValue);
-			if (numeric_is_inf(num))
+			#if 0
+			if (NUMERIC_IS_INF(num))
 			{
 				fieldBsonValue.value_type = BSON_TYPE_DOUBLE;
 				fieldBsonValue.value.v_double = INFINITY;
 			}
-			else if (numeric_is_nan(num))
+			#endif
+			if (numeric_is_nan(num))
 			{
 				fieldBsonValue.value_type = BSON_TYPE_DOUBLE;
 				fieldBsonValue.value.v_double = NAN;

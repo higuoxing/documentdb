@@ -9,6 +9,7 @@
  */
 
 #include <postgres.h>
+#include <unicode/ucol.h>
 #include <unicode/ures.h>
 #include <unicode/uloc.h>
 #include <utils/hsearch.h>

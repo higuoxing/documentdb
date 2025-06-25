@@ -10,6 +10,7 @@
  */
 
 #include <postgres.h>
+#include "utils/datetime.h"
 #include "utils/timestamp.h"
 #include "utils/documentdb_errors.h"
 
@@ -170,6 +171,62 @@ GetPgTimestampFromUnixEpoch(int64_t epochInMs)
 		Float8GetDatum(seconds));
 }
 
+static Timestamp
+dt2local(Timestamp dt, int tz)
+{
+	dt -= (tz * USECS_PER_SEC);
+	return dt;
+}
+
+
+static TimestampTz
+timestamp2timestamptz_opt_overflow(Timestamp timestamp, int *overflow)
+{
+	TimestampTz result;
+	struct pg_tm tt,
+			   *tm = &tt;
+	fsec_t		fsec;
+	int			tz;
+
+	if (overflow)
+		*overflow = 0;
+
+	if (TIMESTAMP_NOT_FINITE(timestamp))
+		return timestamp;
+
+	/* We don't expect this to fail, but check it pro forma */
+	if (timestamp2tm(timestamp, NULL, tm, &fsec, NULL, NULL) == 0)
+	{
+		tz = DetermineTimeZoneOffset(tm, session_timezone);
+
+		result = dt2local(timestamp, -tz);
+
+		if (IS_VALID_TIMESTAMP(result))
+		{
+			return result;
+		}
+		else if (overflow)
+		{
+			if (result < MIN_TIMESTAMP)
+			{
+				*overflow = -1;
+				TIMESTAMP_NOBEGIN(result);
+			}
+			else
+			{
+				*overflow = 1;
+				TIMESTAMP_NOEND(result);
+			}
+			return result;
+		}
+	}
+
+	ereport(ERROR,
+			(errcode(ERRCODE_DATETIME_VALUE_OUT_OF_RANGE),
+			 errmsg("timestamp out of range")));
+
+	return 0;
+}
 
 /*
  * Gets the current time in milliseconds since epoch

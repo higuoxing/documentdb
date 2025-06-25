@@ -31,7 +31,6 @@ set search_path to documentdb_core;
  documentdb_core | bson_to_bsonsequence      | bsonsequence     | bson                                   | func
  documentdb_core | bson_to_bytea             | bytea            | bson                                   | func
  documentdb_core | bson_to_json_string       | cstring          | bson                                   | func
- documentdb_core | bson_typanalyze           | boolean          | internal                               | func
  documentdb_core | bson_unique_index_equal   | boolean          | bson, bson                             | func
  documentdb_core | bsonquery_compare         | integer          | bson, bsonquery                        | func
  documentdb_core | bsonquery_compare         | integer          | bsonquery, bsonquery                   | func
@@ -53,7 +52,7 @@ set search_path to documentdb_core;
  documentdb_core | bsonsequence_send         | bytea            | bsonsequence                           | func
  documentdb_core | bsonsequence_to_bytea     | bytea            | bsonsequence                           | func
  documentdb_core | row_get_bson              | bson             | record                                 | func
-(49 rows)
+(48 rows)
 
 -- show all aggregates exported
 \da+ documentdb_core.*

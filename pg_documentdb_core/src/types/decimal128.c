@@ -16,8 +16,8 @@
 #include "types/decimal128.h"
 
 /* Including lib headers here to limit the exposure and separating the concerns across */
-#include <bid_conf.h>
-#include <bid_functions.h>
+#include "bid_conf.h"
+#include "bid_functions.h"
 #include <math.h>
 #include <lib/stringinfo.h>
 
@@ -103,8 +103,6 @@ typedef enum Decimal128MathOperation
 	Decimal128MathOperation_Acosh = 27,
 	Decimal128MathOperation_Atanh = 28,
 } Decimal128MathOperation;
-
-typedef unsigned int _IDEC_flags;
 
 #define HIGH_BITS(x) (x->value.v_decimal128.high)
 #define LOW_BITS(x) (x->value.v_decimal128.low)
