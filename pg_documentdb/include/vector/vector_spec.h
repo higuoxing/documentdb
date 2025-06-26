@@ -166,6 +166,7 @@ typedef void (*SetSearchParametersToGUCFunc)(const pgbson *searchParamBson);
  * Dynamic calculation of search parameters
  * based on the number of rows and index options.
  */
+typedef double Cardinality;
 typedef pgbson *(*CalculateSearchParamBsonFunc)(bytea *indexOptions,
 												Cardinality indexRows,
 												pgbson *searchParamBson);

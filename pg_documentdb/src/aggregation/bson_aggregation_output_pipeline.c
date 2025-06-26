@@ -32,7 +32,12 @@
 #include <catalog/pg_aggregate.h>
 #include <catalog/pg_class.h>
 #include <catalog/namespace.h>
+#if 0
+/*
+ * rewrite/rewriteSearchCycle.h doesn't exist in gpdb7.
+ */
 #include <rewrite/rewriteSearchCycle.h>
+#endif
 #include <utils/version_utils.h>
 #include <executor/spi.h>
 
@@ -57,6 +62,30 @@
 #include "schema_validation/schema_validation.h"
 
 #include "aggregation/bson_aggregation_pipeline_private.h"
+
+/* FIXME: */
+typedef enum MergeMatchKind
+{
+	MERGE_WHEN_MATCHED,
+	MERGE_WHEN_NOT_MATCHED_BY_SOURCE,
+	MERGE_WHEN_NOT_MATCHED_BY_TARGET
+} MergeMatchKind;
+
+#define NUM_MERGE_MATCH_KINDS (MERGE_WHEN_NOT_MATCHED_BY_TARGET + 1)
+int T_MergeAction = 0;
+typedef struct MergeAction
+{
+	NodeTag		type;
+	MergeMatchKind matchKind;	/* MATCHED/NOT MATCHED BY SOURCE/TARGET */
+	CmdType		commandType;	/* INSERT/UPDATE/DELETE/DO NOTHING */
+	/* OVERRIDING clause */
+	OverridingKind override;
+	Node	   *qual;			/* transformed WHEN conditions */
+	List	   *targetList;		/* the target list (of TargetEntry) */
+	/* target attribute numbers of an UPDATE */
+	List	   *updateColnos;
+} MergeAction;
+
 
 /*
  * $merge stage input field `WhenMatched` options
@@ -102,7 +131,6 @@ typedef struct MergeArgs
 	/* input `whenNotMatched` field */
 	WhenNotMatchedAction whenNotMatched;
 } MergeArgs;
-
 
 /*
  * Struct having parsed view of the arguments to $out stage.
@@ -612,6 +640,7 @@ Query *
 HandleMerge(const bson_value_t *existingValue, Query *query,
 			AggregationPipelineBuildContext *context)
 {
+#if 0
 	ReportFeatureUsage(FEATURE_STAGE_MERGE);
 
 	if (IsCollationApplicable(context->collationString))
@@ -752,7 +781,7 @@ HandleMerge(const bson_value_t *existingValue, Query *query,
 											 validationLevel),
 										 false, true);
 	}
-
+#if 0 // TODO
 	query->mergeActionList = list_make2(MakeActionWhenMatched(mergeArgs.whenMatched,
 															  sourceDocVar, targetDocVar,
 															  schemaValidatorInfoConst,
@@ -763,6 +792,7 @@ HandleMerge(const bson_value_t *existingValue, Query *query,
 																 sourceShardKeyValueVar,
 																 targetCollection,
 																 schemaValidatorInfoConst));
+#endif
 	WriteJoinConditionToQueryDollarMerge(query, sourceDocVar, targetDocVar,
 										 sourceShardKeyValueVar,
 										 targetShardKeyValueVar,
@@ -771,6 +801,8 @@ HandleMerge(const bson_value_t *existingValue, Query *query,
 										 sourceCollectionVarNo,
 										 mergeArgs);
 	return query;
+#endif
+	return NULL;
 }
 
 
@@ -788,7 +820,7 @@ MakeActionWhenMatched(WhenMatchedAction whenMatched, Var *sourceDocVar, Var *tar
 #if PG_VERSION_NUM >= 170000
 	action->matchKind = MERGE_WHEN_MATCHED;
 #else
-	action->matched = true;
+	// action->matched = true;
 #endif
 
 	if (whenMatched == WhenMatched_KEEPEXISTING)
@@ -844,7 +876,7 @@ MakeActionWhenNotMatched(WhenNotMatchedAction whenNotMatched, Var *sourceDocVar,
 #if PG_VERSION_NUM >= 170000
 	action->matchKind = MERGE_WHEN_NOT_MATCHED_BY_TARGET;
 #else
-	action->matched = false;
+	// action->matched = false;
 #endif
 
 	if (whenNotMatched == WhenNotMatched_DISCARD)
@@ -1410,7 +1442,7 @@ AddTargetCollectionRTEDollarMerge(Query *query, MongoCollection *targetCollectio
 #if PG_VERSION_NUM >= 170000
 	query->mergeTargetRelation = query->resultRelation;
 #else
-	query->mergeUseOuterJoin = true;
+	// query->mergeUseOuterJoin = true;
 #endif
 	query->targetList = NIL;
 }
@@ -1533,7 +1565,7 @@ CreateSingleJoinExpr(const char *joinField,
 	{
 		Var *extractedSourceVar = makeVar(sourceCollectionVarNo,
 										  extractFieldResNumber, BsonTypeId(), -1, 0, 0);
-		List *argsforFuncExpr = list_make3(copyObject(targetDocVar), extractedSourceVar,
+		List *argsforFuncExpr = list_make3(copyObjectImpl(targetDocVar), extractedSourceVar,
 										   onCondition);
 		singleJoinExpr = (Expr *) makeFuncExpr(
 			BsonDollarMergeJoinFunctionOid(), BOOLOID, argsforFuncExpr, InvalidOid,
@@ -2001,7 +2033,9 @@ HandleOut(const bson_value_t *existingValue, Query *query,
 	RearrangeTargetListForMerge(query, targetCollection, false, NULL);
 	context->expandTargetList = true;
 	query = MigrateQueryToSubQuery(query, context);
+#if 0
 	query->commandType = CMD_MERGE;
+#endif
 	AddTargetCollectionRTEDollarMerge(query, targetCollection);
 
 	/* If targetCollection enables schema validation, apply to target document*/
@@ -2031,14 +2065,14 @@ HandleOut(const bson_value_t *existingValue, Query *query,
 
 	Var *targetShardKeyValueVar = makeVar(targetCollectionVarNo,
 										  targetShardKeyValueAttrNo, INT8OID, -1, 0, 0);
-
+#if 0 // TODO
 	query->mergeActionList = list_make1(MakeActionWhenNotMatched(WhenNotMatched_INSERT,
 																 sourceDocVar,
 																 generatedObjectIdVar,
 																 sourceShardKeyValueVar,
 																 targetCollection,
 																 schemaValidatorInfoConst));
-
+#endif
 	/* Write the join condition for $out, which will be in the form of
 	 * `ON target.shard_key_value = source.target_shard_key_value`
 	 * This is necessary because Citus requires the target's distributed column in the join condition.

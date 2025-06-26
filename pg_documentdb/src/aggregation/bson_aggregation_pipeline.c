@@ -1332,12 +1332,14 @@ GenerateAggregationQuery(text *database, pgbson *aggregationSpec, QueryData *que
 		 */
 		addCursorParams = false;
 	}
+#if 0 // TODO
 	else if (query->commandType == CMD_MERGE)
 	{
 		/* CMD_MERGE is case when pipeline has output stage ($merge or $out) result will be always single batch. */
 		ThrowIfServerOrTransactionReadOnly();
 		queryData->cursorKind = QueryCursorType_SingleBatch;
 	}
+#endif
 	else if (queryData->cursorKind == QueryCursorType_Unspecified)
 	{
 		queryData->cursorKind =
@@ -5084,7 +5086,7 @@ AddMergeObjectsGroupAccumulator(Query *query, const bson_value_t *accumulatorVal
 	Const *nConst = makeConst(INT8OID, -1, InvalidOid, sizeof(int64_t),
 							  Int64GetDatum(INT_MAX), false, true);
 	ArrayType *arrayValue = construct_array(sortDatumArray, nelems, BsonTypeId(), -1,
-											false, TYPALIGN_INT);
+											false, 'i');
 
 	Const *sortArrayConst = makeConst(GetBsonArrayTypeOid(), -1, InvalidOid, -1,
 									  PointerGetDatum(arrayValue), false, false);
@@ -5223,7 +5225,7 @@ AddSortedGroupAccumulator(Query *query, const bson_value_t *accumulatorValue,
 	}
 
 	ArrayType *arrayValue = construct_array(sortDatumArray, nelems, BsonTypeId(), -1,
-											false, TYPALIGN_INT);
+											false, 'i');
 
 	Const *sortArrayConst = makeConst(GetBsonArrayTypeOid(), -1, InvalidOid, -1,
 									  PointerGetDatum(arrayValue), false, false);
@@ -5313,7 +5315,7 @@ AddSortedNGroupAccumulator(Query *query, const bson_value_t *input,
 	Const *nConst = makeConst(INT8OID, -1, InvalidOid, sizeof(int64_t),
 							  Int64GetDatum(elementsToFetch->value.v_int64), false, true);
 	ArrayType *arrayValue = construct_array(sortDatumArray, nelems, BsonTypeId(), -1,
-											false, TYPALIGN_INT);
+											false, 'i');
 	Const *sortArrayConst = makeConst(GetBsonArrayTypeOid(), -1, InvalidOid, -1,
 									  PointerGetDatum(arrayValue), false, false);
 	Aggref *aggref = CreateMultiArgAggregate(aggregateFunctionOid,

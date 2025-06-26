@@ -31,7 +31,12 @@
 #include <utils/builtins.h>
 #include <catalog/pg_aggregate.h>
 #include <catalog/pg_class.h>
+#if 0
+/*
+ * rewrite/rewriteSearchCycle.h doesn't exist in gpdb7.
+ */
 #include <rewrite/rewriteSearchCycle.h>
+#endif
 #include <utils/version_utils.h>
 
 #include "io/bson_core.h"
@@ -1898,11 +1903,21 @@ MakeLookupJoinRte(List *joinVars, List *colNames, List *joinLeftCols, List *join
 	joinRte->relid = InvalidOid;
 	joinRte->subquery = NULL;
 	joinRte->jointype = JOIN_LEFT;
+#if 0
+	/*
+	 * joinmergedcols doesn't exist in gpdb7.
+	 */
 	joinRte->joinmergedcols = 0; /* No using clause */
+#endif
 	joinRte->joinaliasvars = joinVars;
+#if 0
+	/*
+	 * These fields don't exist in gpdb7.
+	 */
 	joinRte->joinleftcols = joinLeftCols;
 	joinRte->joinrightcols = joinRightCols;
 	joinRte->join_using_alias = NULL;
+#endif
 	joinRte->alias = makeAlias("lookup_join", colNames);
 	joinRte->eref = joinRte->alias;
 	joinRte->inh = false;           /* never true for joins */
@@ -2464,7 +2479,7 @@ ProcessLookupCoreWithLet(Query *query, AggregationPipelineBuildContext *context,
 										BsonTypeId(), -1,
 										InvalidOid, matchLevelsUp);
 				inClause = (Node *) make_opclause(BsonEqualOperatorId(), BOOLOID, false,
-												  copyObject(
+												  copyObjectImpl(
 													  rightObjectIdEntry->expr),
 												  (Expr *) matchVar, InvalidOid,
 												  InvalidOid);
@@ -2482,7 +2497,7 @@ ProcessLookupCoreWithLet(Query *query, AggregationPipelineBuildContext *context,
 				Var *matchVar = makeVar(leftQueryRteIndex, newProjectorAttrNum,
 										GetBsonArrayTypeOid(), -1,
 										InvalidOid, matchLevelsUp);
-				List *inArgs = list_make2(copyObject(rightObjectIdEntry->expr), matchVar);
+				List *inArgs = list_make2(copyObjectImpl(rightObjectIdEntry->expr), matchVar);
 				inOperator->args = inArgs;
 				inClause = (Node *) inOperator;
 			}
@@ -2494,7 +2509,7 @@ ProcessLookupCoreWithLet(Query *query, AggregationPipelineBuildContext *context,
 										InvalidOid, matchLevelsUp);
 				Const *textConst = MakeTextConst(lookupArgs->foreignField.string,
 												 lookupArgs->foreignField.length);
-				List *inArgs = list_make3(copyObject(rightVar), matchVar, textConst);
+				List *inArgs = list_make3(copyObjectImpl(rightVar), matchVar, textConst);
 				inClause = (Node *) makeFuncExpr(BsonDollarLookupJoinFilterFunctionOid(),
 												 BOOLOID, inArgs,
 												 InvalidOid, InvalidOid,
@@ -2669,7 +2684,7 @@ ProcessLookupCoreWithLet(Query *query, AggregationPipelineBuildContext *context,
 
 		TargetEntry *firstEntry = linitial(cteLookupQuery->targetList);
 		TargetEntry *secondEntry = lsecond(cteLookupQuery->targetList);
-		Var *secondVar = (Var *) copyObject(secondEntry->expr);
+		Var *secondVar = (Var *) copyObjectImpl(secondEntry->expr);
 		secondVar->varlevelsup = INT_MAX;
 		secondVar->location = context->nestedPipelineLevel;
 
@@ -2677,7 +2692,7 @@ ProcessLookupCoreWithLet(Query *query, AggregationPipelineBuildContext *context,
 		Var *letVar = NULL;
 		if (lookupArgs->let)
 		{
-			letExpr = copyObject(lthird_node(TargetEntry,
+			letExpr = copyObjectImpl(lthird_node(TargetEntry,
 											 cteLookupQuery->targetList)->expr);
 			letVar = (Var *) letExpr;
 			letVar->varlevelsup = INT_MAX;
@@ -2773,7 +2788,7 @@ ProcessLookupCoreWithLet(Query *query, AggregationPipelineBuildContext *context,
 		if (lookupContext->preserveNullAndEmptyArrays)
 		{
 			Expr *coalesceExpr = GetEmptyBsonCoalesce(rightDocExpr);
-			list_nth_cell(mergeDocumentsArgs, 1)->ptr_value = coalesceExpr;
+			list_nth_cell(mergeDocumentsArgs, 1)->data.ptr_value = coalesceExpr;
 		}
 		else
 		{
@@ -3770,6 +3785,7 @@ BuildRecursiveGraphLookupQuery(QuerySource parentSource, GraphLookupArgs *args,
 							   AggregationPipelineBuildContext *parentContext,
 							   CommonTableExpr *baseCteExpr, int baseCteLevelsUp)
 {
+#if 0
 	AggregationPipelineBuildContext subPipelineContext = { 0 };
 	subPipelineContext.nestedPipelineLevel = parentContext->nestedPipelineLevel + 1;
 	subPipelineContext.databaseNameDatum = parentContext->databaseNameDatum;
@@ -3972,6 +3988,8 @@ BuildRecursiveGraphLookupQuery(QuerySource parentSource, GraphLookupArgs *args,
 
 	pfree(parseState);
 	return graphLookupQuery;
+#endif
+	return NULL;
 }
 
 
@@ -4028,7 +4046,7 @@ ReplaceVariablesWithLevelsUpMutator(Node *node, LevelsUpQueryTreeWalkerState *st
 
 		if (equal(node, state->originalVariable))
 		{
-			Var *copyVar = copyObject(originalVar);
+			Var *copyVar = copyObjectImpl(originalVar);
 			copyVar->varlevelsup = state->numLevels;
 			return (Node *) copyVar;
 		}

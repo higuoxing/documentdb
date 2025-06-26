@@ -123,8 +123,7 @@ explain_get_index_name_hook_type ExtensionPreviousIndexNameHook = NULL;
  * to the planner.
  */
 PlannedStmt *
-DocumentDBApiPlanner(Query *parse, const char *queryString, int cursorOptions,
-					 ParamListInfo boundParams)
+DocumentDBApiPlanner(Query *parse, int cursorOptions, ParamListInfo boundParams)
 {
 	bool hasUnresolvedParams = false;
 	int queryFlags = 0;
@@ -190,12 +189,11 @@ DocumentDBApiPlanner(Query *parse, const char *queryString, int cursorOptions,
 
 	if (ExtensionPreviousPlannerHook != NULL)
 	{
-		plan = ExtensionPreviousPlannerHook(parse, queryString, cursorOptions,
-											boundParams);
+		plan = ExtensionPreviousPlannerHook(parse, cursorOptions, boundParams);
 	}
 	else
 	{
-		plan = standard_planner(parse, queryString, cursorOptions, boundParams);
+		plan = standard_planner(parse, cursorOptions, boundParams);
 	}
 
 	if (hasUnresolvedParams)

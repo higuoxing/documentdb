@@ -47,7 +47,12 @@ _PG_init(void)
 	InstallBsonMemVTables();
 	InitApiConfigurations("documentdb", "documentdb");
 	InitializeSharedMemoryHooks();
+#if 0
+	/*
+	 * MarkGUCPrefixReserved doesn't exist in gpdb7.
+	 */
 	MarkGUCPrefixReserved("documentdb");
+#endif
 	InitializeDocumentDBBackgroundWorker("pg_documentdb", "documentdb", "documentdb");
 
 	InstallDocumentDBApiPostgresHooks();
